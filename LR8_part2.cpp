@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -59,38 +59,62 @@ int addIndex(List<T, S>& list, T data, int index)
 template<typename T, unsigned int S>
 T popForth(List<T, S>& list)
 {
-	T data = *list.nodes[0];
-	for (unsigned int i = 0; i < list.size - 1; i++)
+	if (list.size != 0)
 	{
-		list.nodes[i] = list.nodes[i + 1];
+		T data = *list.nodes[0];
+		for (unsigned int i = 0; i < list.size - 1; i++)
+		{
+			list.nodes[i] = list.nodes[i + 1];
+		}
+		list.nodes[list.size - 1] = nullptr;
+		list.size--;
+		return data;
 	}
-	list.nodes[list.size - 1] = nullptr;
-	list.size--;
-	return data;
+	else
+	{
+		cout << "list clear!" << endl;
+		retorn 1;
+	}
 }
 
 template<typename T, unsigned int S>
 T
 popBack(List<T, S>& list)
 {
-	T data = *list.nodes[list.size - 1];
-	list.nodes[list.size - 1] = nullptr;
-	list.size--;
-	return data;
+	if (list.size != 0)
+	{
+		T data = *list.nodes[list.size - 1];
+		list.nodes[list.size - 1] = nullptr;
+		list.size--;
+		return data;
+	}
+	else
+	{
+		cout << "list clear!" << endl;
+		retorn 1;
+	}
 }
 
 template<typename T, unsigned int S>
 T
 popIndex(List<T, S>& list, unsigned int index)
 {
-	T data = *list.nodes[index];
-	for (unsigned int i = index; i < list.size - 1; i++)
+	if (index > list.size)
 	{
-		list.nodes[i] = list.nodes[i + 1];
+		cout << "Index too big!" << endl;
+		return 1;
 	}
-	list.nodes[list.size - 1] = nullptr;
-	list.size--;
-	return data;
+	else
+	{
+		T data = *list.nodes[index];
+		for (unsigned int i = index; i < list.size - 1; i++)
+		{
+			list.nodes[i] = list.nodes[i + 1];
+		}
+		list.nodes[list.size - 1] = nullptr;
+		list.size--;
+		return data;
+	}
 }
 
 template<typename T, unsigned int S>
@@ -119,7 +143,7 @@ void print(List<T, S>& list)
 {
 	for (int i = 0; i < list.size; i++)
 	{
-		cout << *list.nodes[i] << " ";
+		cout << *list.nodes[i] << ", ";
 	}
 }
 
@@ -183,8 +207,9 @@ int main()
 	popIndex(Joja, 3);
 	cout << endl;
 	print(Joja);
-	cout << endl << ExtractionIndex(Joja, 0);
-	cout << endl << findPos(Joja, 4);
+	cout << endl << "Size -- " << size(Joja);
+	cout << endl << "What in 1st element -- " << ExtractionIndex(Joja, 0);
+	cout << endl << "What pos element 4 --  " << findPos(Joja, 4);
 	destructor(Joja);
 
 	cout << endl;
@@ -203,16 +228,11 @@ int main()
 	constuctor(People);
 	print(People);
 	addEnd(People, firstMan);
-
 	addEnd(People, secondMan);
-
 	addEnd(People, thirdMan);
-
-	addEnd(People, secondMan);
 	print(People);
 	cout << endl;
-	std::cout << findPos(People, thirdMan) << std::endl;
-	std::cout << findPos(People, thirdMan) << std::endl;
+	std::cout << "Pos 3 man in massiv -- " << findPos(People, thirdMan) << std::endl;
 	destructor(People);
 	print(People);
 	return 0;

@@ -28,12 +28,8 @@ int addEnd(List<T, S>& list, T data)
 		T* newNode = new T{ data };
 		list.nodes[list.size] = newNode;
 		list.size++;
-		return 0;
 	}
-	else
-	{
-		return 0;
-	}
+	return 0;
 }
 
 template<typename T, unsigned int S>
@@ -48,12 +44,8 @@ int addIndex(List<T, S>& list, T data, int index)
 		}
 		list.nodes[index] = newNode;
 		list.size++;
-		return 0;
 	}
-	else
-	{
-		return 0;
-	}
+	return 0;
 }
 
 template<typename T, unsigned int S>
@@ -87,7 +79,7 @@ popBack(List<T, S>& list)
 
 template<typename T, unsigned int S>
 T
-popIndex(List<T, S>& list, unsigned int index)
+popIndex(List<T, S>& list, int index)
 {
 	if (index > list.size)
 	{
@@ -96,7 +88,7 @@ popIndex(List<T, S>& list, unsigned int index)
 	else
 	{
 		T data = *list.nodes[index];
-		for (unsigned int i = index; i < list.size - 1; i++)
+		for (int i = index; i < list.size - 1; i++)
 		{
 			list.nodes[i] = list.nodes[i + 1];
 		}

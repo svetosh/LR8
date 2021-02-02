@@ -1,360 +1,228 @@
-#include <csignal>
 #include <iostream>
 #include <string>
 
 using namespace std;
 
-template<typename T>
-struct DoublyLinkedRingList
+template<typename T, unsigned int S>
+struct List
 {
-    DoublyLinkedRingList<T>* previous;
-    DoublyLinkedRingList<T>* next;
-    T data;
+	T* nodes[S];
+	int size;
 };
 
-template<typename T>
-struct RingList
+template<typename T, unsigned int S>
+void constuctor(List<T, S>& list)
 {
-    DoublyLinkedRingList<T>* first;
-    int size;
-};
-
-template<typename T>
-void constructor(RingList<T>& list)
-{
-    list.first = nullptr;
-    list.size = 0;
+	list.size = 0;
+	for (int i = 0; i < S; i++)
+	{
+		list.nodes[i] = nullptr;
+	}
 }
 
-template<typename T>
-int size(RingList<T>& list)
+template<typename T, unsigned int S>
+int addEnd(List<T, S>& list, T data)
 {
-    return list.size;
+	if (list.size < S)
+	{
+		T* newNode = new T{ data };
+		list.nodes[list.size] = newNode;
+		list.size++;
+		return 0;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
-template<typename T>
-void push_forth(RingList<T>& list, T data)
+template<typename T, unsigned int S>
+int addIndex(List<T, S>& list, T data, int index)
 {
-    DoublyLinkedRingList<T>* Joja = new DoublyLinkedRingList<T>;
-    Joja->data = data;
-    if (list.first == nullptr)
-    {
-        list.first = Joja;
-        Joja->next = Joja;
-        Joja->previous = Joja;
-    }
-    else
-    {
-        list.first->previous->next = Joja;
-        Joja->previous = list.first->previous;
-        list.first->previous = Joja;
-        Joja->next = list.first;
-        list.first = Joja;
-    }
-    list.size++;
+	if (list.size < S)
+	{
+		T* newNode = new T{ data };
+		for (int i = list.size; i > index; i--)
+		{
+			list.nodes[i] = list.nodes[i - 1];
+		}
+		list.nodes[index] = newNode;
+		list.size++;
+		return 0;
+	}
+	else
+	{
+		return 0;
+	}
 }
 
-template<typename T>
-void pushBack(RingList<T>& list, T data)
+template<typename T, unsigned int S>
+T popForth(List<T, S>& list)
 {
-    DoublyLinkedRingList<T>* Joja = new DoublyLinkedRingList<T>;
-    Joja->data = data;
-    if (list.first == nullptr)
-    {
-        list.first = Joja;
-        Joja->next = Joja;
-        Joja->previous = Joja;
-    }
-    else
-    {
-        list.first->previous->next = Joja;
-        Joja->previous = list.first->previous;
-        list.first->previous = Joja;
-        Joja->next = list.first;
-    }
-    list.size++;
+	if (list.size != 0)
+	{
+		T data = *list.nodes[0];
+		for (unsigned int i = 0; i < list.size - 1; i++)
+		{
+			list.nodes[i] = list.nodes[i + 1];
+		}
+		list.nodes[list.size - 1] = nullptr;
+		list.size--;
+		return data;
+	}
 }
 
-template <typename T>
-void incert
-(RingList<T>& list, T data, int index)
+template<typename T, unsigned int S>
+T
+popBack(List<T, S>& list)
 {
-    DoublyLinkedRingList<T>* Joja = new DoublyLinkedRingList<T>;
-    Joja->next = list.first;
-    Joja->data = data;
-    for (int i = 0; i < index; ++i)
-    {
-        Joja->next = Joja->next->next;
-    }
-    Joja->previous = Joja->next->previous;
-    Joja->next->previous = Joja;
-    Joja->previous->next = Joja;
-    list.size++;
+	if (list.size != 0)
+	{
+		T data = *list.nodes[list.size - 1];
+		list.nodes[list.size - 1] = nullptr;
+		list.size--;
+		return data;
+	}
 }
 
-template <typename T>
-void incertPointer
-(RingList<T>& list, T data, DoublyLinkedRingList<T>* a)
+template<typename T, unsigned int S>
+T
+popIndex(List<T, S>& list, unsigned int index)
 {
-    DoublyLinkedRingList<T>* Joja = new DoublyLinkedRingList<T>;
-    Joja->data = data;
-    Joja->next = a->next;
-    Joja->previous = a;
-    Joja->next->previous = Joja;
-    Joja->previous->next = Joja;
-    list.size++;
+	if (index > list.size)
+	{
+		return 0;
+	}
+	else
+	{
+		T data = *list.nodes[index];
+		for (unsigned int i = index; i < list.size - 1; i++)
+		{
+			list.nodes[i] = list.nodes[i + 1];
+		}
+		list.nodes[list.size - 1] = nullptr;
+		list.size--;
+		return data;
+	}
 }
 
-template<typename T>
-T popFirst(RingList<T>& list)
+template<typename T, unsigned int S>
+T
+ExtractionIndex(List<T, S>& list, unsigned int index)
 {
-    T data;
-    if (list.first != nullptr)
-    {
-        DoublyLinkedRingList<T>* a = list.first;
-        list.first->previous->next = list.first->next;
-        list.first = list.first->next;
-        list.first->previous = a->previous;
-        data = a->data;
-        delete a;
-        list.size--;
-    }
-    return data;
+	return *list.nodes[index];
 }
 
-template<typename T>
-T popEnd(RingList<T>& list)
+template<typename T, unsigned int S>
+unsigned int
+findPos(List<T, S>& list, T data)
 {
-    T data;
-    if (list.first != nullptr)
-    {
-        DoublyLinkedRingList<T>* a = list.first->previous;
-        list.first->previous = list.first->previous->previous;
-        list.first->previous->next = list.first;
-        data = a->data;
-        delete a;
-        list.size--;
-    }
-    return data;
+	for (unsigned int i = 0; i < list.size; ++i)
+	{
+		if (*list.nodes[i] == data)
+		{
+			return i;
+		}
+	}
+	return list.size;
 }
 
-template <typename T>
-T exstract
-(RingList<T>& list, int index)
+template<typename T, unsigned int S>
+void print(List<T, S>& list)
 {
-    T data;
-    DoublyLinkedRingList<T>* Joja = list.first;
-    for (int i = 0; i < index; ++i)
-    {
-        Joja = Joja->next;
-    }
-    if (Joja != nullptr)
-    {
-        Joja->next->previous = Joja->previous;
-        Joja->previous->next = Joja->next;
-        data = Joja->data;
-        delete Joja;
-        list.size--;
-    }
-    return data;
+	for (int i = 0; i < list.size; i++)
+	{
+		cout << *list.nodes[i] << ", ";
+	}
 }
 
-template <typename T>
-T exstractPointer
-(RingList<T>& list, DoublyLinkedRingList<T>* a)
+template<typename T, unsigned int S>
+unsigned long int
+size(List<T, S>& list)
 {
-    T data;
-    DoublyLinkedRingList<T>* Joja = list.first;
-    if (a == list.first)
-    {
-        a = list.first->next;
-    }
-    if (a != nullptr)
-    {
-        Joja = a;
-        Joja->next->previous = Joja->previous;
-        Joja->previous->next = Joja->next;
-        data = Joja->data;
-        delete Joja;
-        list.size--;
-    }
-    return data;
+	return list.size;
 }
 
-template <typename T>
-T GetByIndex
-(RingList<T>& list, int index)
+template<typename T, unsigned int S>
+void
+destructor(List<T, S>& list)
 {
-    T data;
-    DoublyLinkedRingList<T>* Joja = list.first;
-    if (Joja != nullptr)
-    {
-        for (int i = 0; i < index; ++i)
-        {
-            Joja = Joja->next;
-        }
-        data = Joja->data;
-        std::cout << data << std::endl;
-    }
-    return data;
+	list.size = 0;
+	for (int i = 0; i < S; i++)
+	{
+		list.nodes[i] = 0;
+	}
 }
 
-template <typename T>
-int scan
-(RingList<T>& list, T data)
-{
-    int index = 0;
-    DoublyLinkedRingList<T>* Joja = list.first;
-    if (Joja != nullptr)
-    {
-        while (Joja->data != data) {
-            ++index;
-            Joja = Joja->next;
-        }
-    }
-    return index;
-}
-
-template <typename T>
-void print(RingList<T>& list)
-{
-    DoublyLinkedRingList<T>* a = list.first;
-    for (int i = 0; i < list.size; ++i)
-    {
-        std::cout << a->data << ' ';
-        a = a->next;
-    }
-}
-
-template<typename T>
-void destructor(RingList<T>& list)
-{
-    for (int i = 1; i < list.size; i++) 
-    {
-        list.first = list.first->next;
-        delete list.first->previous;
-    }
-    delete list.first;
-    list.first = nullptr;
-    list.size = 0;
-    std::cout << "List clear" << std::endl;
-}
-
-class Human 
+class Human
 {
 public:
-    string name;
-    int age;
+	string name;
+	int age;
+
 };
 
 std::ostream&
-operator<<(std::ostream& out, Human& obj)
+operator<<(std::ostream& out, Human obj)
 {
-    out << obj.age << " " << obj.name;
-    return out;
+	out << obj.age << " " << obj.name;
+	return out;
 }
 
-int
-main()
+bool
+operator==(Human& a, Human& b)
 {
-    RingList<int> test_int;
-    constructor(test_int);
+	return a.age == b.age;
+}
 
-    std::cout << " push forth" << std::endl;
-    for (int i = 0; i < 5; ++i)
-    {
-        push_forth(test_int, i);
-    }
-    print(test_int);
+int main()
+{
+	List<int, 10> Joja;
+	constuctor(Joja);
+	addEnd(Joja, 2);
+	addEnd(Joja, 3);
+	addEnd(Joja, 4);
+	addEnd(Joja, 5);
+	addEnd(Joja, 6);
+	addEnd(Joja, 7);
+	addEnd(Joja, 8);
+	print(Joja);
+	popForth(Joja);
+	cout << endl;
+	print(Joja);
+	popBack(Joja);
+	cout << endl;
+	print(Joja);
+	popIndex(Joja, 3);
+	cout << endl;
+	print(Joja);
+	cout << endl << "Size -- " << size(Joja);
+	cout << endl << "What in 1st element -- " << ExtractionIndex(Joja, 0);
+	cout << endl << "What pos element 4 --  " << findPos(Joja, 4);
+	destructor(Joja);
 
-    std::cout << std::endl << " pushBack" << std::endl;
-    for (int i = 0; i < 5; ++i)
-    {
-        pushBack(test_int, i);
-    }
-    print(test_int);
+	cout << endl;
+	cout << endl;
+	cout << endl;
 
-    int index = 4;
-    std::cout << std::endl << " incert" << std::endl;
-    for (int i = 0; i < 5; ++i)
-    {
-        incert(test_int, i, index);
-    }
-    print(test_int);
+	Human firstMan, secondMan, thirdMan;
+	firstMan.age = 20;
+	firstMan.name = "Pora";
+	secondMan.age = 30;
+	secondMan.name = "Gora";
+	thirdMan.age = 40;
+	thirdMan.name = "Vora";
 
-    std::cout << std::endl << " incert Pointer" << std::endl;
-    for (int i = 0; i < 5; ++i)
-    {
-        incertPointer(test_int, i + 20, test_int.first->next->next);
-    }
-    print(test_int);
-
-    std::cout << std::endl << " pop first" << std::endl;
-    for (int i = 0; i < 5; ++i)
-    {
-        popFirst(test_int);
-    }
-    print(test_int);
-
-    std::cout << std::endl << " pop end" << std::endl;
-    for (int i = 0; i < 5; ++i)
-    {
-        popEnd(test_int);
-    }
-    print(test_int);
-
-    std::cout << std::endl << " exstract " << std::endl;
-    for (int i = 0; i < 3; ++i)
-    {
-        exstract(test_int, index);
-    }
-    print(test_int);
-
-    std::cout << std::endl << " exstract Pointer" << std::endl;
-    for (int i = 0; i < 2; ++i)
-    {
-        exstractPointer(test_int, test_int.first);
-    }
-    print(test_int);
-
-    std::cout << std::endl << " Get by index " << std::endl;
-    GetByIndex(test_int, 2);
-    print(test_int);
-
-    int value = 22;
-    std::cout << std::endl << " scan " << std::endl;
-    std::cout << scan(test_int, value) << std:: endl;
-    print(test_int);
-
-    std::cout << std::endl;
-    destructor(test_int);
-
-
-    cout << endl;
-    cout << endl;
-    cout << endl;
-
-    Human firstMan, secondMan, thirdMan;
-    firstMan.age = 20;
-    firstMan.name = "Pora";
-    secondMan.age = 30;
-    secondMan.name = "Gora";
-    thirdMan.age = 40;
-    thirdMan.name = "Vora";
-
-    RingList<Human> test_Human;
-    constructor(test_Human);
-    cout << endl << "------------------------------------------" << endl;
-    pushBack(test_Human, firstMan);
-    push_forth(test_Human, secondMan);
-    pushBack(test_Human, thirdMan);
-    print(test_Human);
-
-    cout << endl << "------------------------------------------" << endl;
-    popFirst(test_Human);
-    popEnd(test_Human);
-    print(test_Human);
-
-    cout << endl << "------------------------------------------" << endl;
-    destructor(test_Human);
-    return 0;
+	List<Human, 10> People;
+	constuctor(People);
+	print(People);
+	addEnd(People, firstMan);
+	addEnd(People, secondMan);
+	addEnd(People, thirdMan);
+	print(People);
+	cout << endl;
+	std::cout << "Pos 3 man in massiv -- " << findPos(People, thirdMan) << std::endl;
+	destructor(People);
+	print(People);
+	return 0;
+}

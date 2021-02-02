@@ -1,5 +1,8 @@
-﻿#include <csignal>
+#include <csignal>
 #include <iostream>
+#include <string>
+
+using namespace std;
 
 template<typename T>
 struct DoublyLinkedRingList
@@ -200,21 +203,16 @@ template <typename T>
 int scan
 (RingList<T>& list, T data)
 {
-    int index;
+    int index = 0;
     DoublyLinkedRingList<T>* Joja = list.first;
     if (Joja != nullptr)
     {
-        for (int i = 0; i < list.size; ++i)
-        {
-            if (Joja->data == data)
-            {
-                std::cout << i << std::endl;
-                return i;
-            }
+        while (Joja->data != data) {
+            ++index;
             Joja = Joja->next;
         }
     }
-    return 0;
+    return index;
 }
 
 template <typename T>
@@ -226,6 +224,34 @@ void print(RingList<T>& list)
         std::cout << a->data << ' ';
         a = a->next;
     }
+}
+
+template<typename T>
+void destructor(RingList<T>& list)
+{
+    for (int i = 1; i < list.size; i++) 
+    {
+        list.first = list.first->next;
+        delete list.first->previous;
+    }
+    delete list.first;
+    list.first = nullptr;
+    list.size = 0;
+    std::cout << "List clear" << std::endl;
+}
+
+class Human 
+{
+public:
+    string name;
+    int age;
+};
+
+std::ostream&
+operator<<(std::ostream& out, Human& obj)
+{
+    out << obj.age << " " << obj.name;
+    return out;
 }
 
 int
@@ -291,14 +317,44 @@ main()
     }
     print(test_int);
 
-    std::cout << std::endl << " Get by index " << std::endl;  
-        GetByIndex(test_int, 2);
+    std::cout << std::endl << " Get by index " << std::endl;
+    GetByIndex(test_int, 2);
     print(test_int);
 
     int value = 22;
     std::cout << std::endl << " scan " << std::endl;
-    scan(test_int, value);
+    std::cout << scan(test_int, value) << std:: endl;
     print(test_int);
 
+    std::cout << std::endl;
+    destructor(test_int);
+
+
+    cout << endl;
+    cout << endl;
+    cout << endl;
+
+    Human firstMan, secondMan, thirdMan;
+    firstMan.age = 20;
+    firstMan.name = "Pora";
+    secondMan.age = 30;
+    secondMan.name = "Gora";
+    thirdMan.age = 40;
+    thirdMan.name = "Vora";
+
+    RingList<Human> test_Human;
+    constructor(test_Human);
+    cout << endl << "------------------------------------------" << endl;
+    pushBack(test_Human, firstMan);
+    push_forth(test_Human, secondMan);
+    pushBack(test_Human, thirdMan);
+    print(test_Human);
+
+    cout << endl << "------------------------------------------" << endl;
+    popFirst(test_Human);
+    popEnd(test_Human);
+    print(test_Human);
+
+    cout << endl << "------------------------------------------" << endl;
+    destructor(test_Human);
     return 0;
-}

@@ -200,16 +200,17 @@ T GetByIndex
 }
 
 template <typename T>
-int scan
-(RingList<T>& list, T data)
-{
+int scan(RingList<T>& list, T data) {
     int index = 0;
-    DoublyLinkedRingList<T>* Joja = list.first;
-    if (Joja != nullptr)
+    DoublyLinkedRingList<T>* gg = list.first;
+    while (gg->data != data)
     {
-        while (Joja->data != data) {
-            ++index;
-            Joja = Joja->next;
+        gg = gg->next;
+        ++index;
+        if (gg == list.first)
+        {
+            cout << "No element " << endl;
+            return -1;
         }
     }
     return index;
@@ -229,7 +230,7 @@ void print(RingList<T>& list)
 template<typename T>
 void destructor(RingList<T>& list)
 {
-    for (int i = 1; i < list.size; i++) 
+    for (int i = 1; i < list.size; i++)
     {
         list.first = list.first->next;
         delete list.first->previous;
@@ -240,7 +241,7 @@ void destructor(RingList<T>& list)
     std::cout << "List clear" << std::endl;
 }
 
-class Human 
+class Human
 {
 public:
     string name;
@@ -321,9 +322,9 @@ main()
     GetByIndex(test_int, 2);
     print(test_int);
 
-    int value = 22;
+    int value = 2;
     std::cout << std::endl << " scan " << std::endl;
-    std::cout << scan(test_int, value) << std:: endl;
+    std::cout << scan(test_int, value) << std::endl;
     print(test_int);
 
     std::cout << std::endl;
@@ -358,3 +359,4 @@ main()
     cout << endl << "------------------------------------------" << endl;
     destructor(test_Human);
     return 0;
+}

@@ -54,6 +54,8 @@ T popForth(List<T, S>& list)
 	if (list.size != 0)
 	{
 		T data = *list.nodes[0];
+		delete list.nodes[0];
+		list.nodes[0] = nullptr;
 		for (unsigned int i = 0; i < list.size - 1; i++)
 		{
 			list.nodes[i] = list.nodes[i + 1];
@@ -71,6 +73,7 @@ popBack(List<T, S>& list)
 	if (list.size != 0)
 	{
 		T data = *list.nodes[list.size - 1];
+		delete list.nodes[list.size - 1];
 		list.nodes[list.size - 1] = nullptr;
 		list.size--;
 		return data;
@@ -88,6 +91,8 @@ popIndex(List<T, S>& list, int index)
 	else
 	{
 		T data = *list.nodes[index];
+		delete list.nodes[index];
+		list.nodes[index] = nullptr;
 		for (int i = index; i < list.size - 1; i++)
 		{
 			list.nodes[i] = list.nodes[i + 1];
@@ -142,7 +147,8 @@ destructor(List<T, S>& list)
 	list.size = 0;
 	for (int i = 0; i < S; i++)
 	{
-		list.nodes[i] = 0;
+		delete list.nodes[i];
+		list.nodes[i] = nullptr;
 	}
 }
 
@@ -151,7 +157,6 @@ class Human
 public:
 	string name;
 	int age;
-
 };
 
 std::ostream&
@@ -192,6 +197,7 @@ int main()
 	cout << endl << "What in 1st element -- " << ExtractionIndex(Joja, 0);
 	cout << endl << "What pos element 4 --  " << findPos(Joja, 4);
 	destructor(Joja);
+	print(Joja);
 
 	cout << endl;
 	cout << endl;
